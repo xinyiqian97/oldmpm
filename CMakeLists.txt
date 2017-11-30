@@ -32,6 +32,11 @@ add_definitions(${TBB_DEFINITIONS})
 include_directories(${TBB_INCLUDE_DIRS})
 link_libraries(${TBB_LIBRARIES})
 
+# Boost FileSystem
+find_package(Boost REQUIRED COMPONENTS system serialization)
+include_directories(${BOOST_INCLUDE_DIRS})
+link_libraries(${Boost_SERIALIZATION_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
 # Include directories
 include_directories(
   ${mpm_SOURCE_DIR}/include/

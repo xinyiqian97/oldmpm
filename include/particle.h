@@ -7,7 +7,16 @@
 #include <memory>
 #include <vector>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+
+#define EIGEN_DENSEBASE_PLUGIN "EigenDenseBaseAddons.h"
+#include "Eigen/Core"
 #include "Eigen/Dense"
+#include "Eigen/src/Core/DenseBase.h"
 
 #include "cell.h"
 
@@ -25,6 +34,8 @@ class Particle {
  public:
   //! Define a vector of size dimension
   using VectorDim = Eigen::Matrix<double, Tdim, 1>;
+
+  Particle() : id_{9999} {}
 
   // Constructor with id and coordinates
   //! \param[in] id Particle id
@@ -67,6 +78,14 @@ class Particle {
 
   //! Cell
   std::shared_ptr<Cell<Tdim>> cell_;
+
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive & ar, const unsigned int version) {
+    ar & id_;
+    ar & coordinates_;
+  }
+
 };  // Particle class
 }  // mpm namespace
 
