@@ -164,7 +164,8 @@ TEST_CASE("Particle is checked for 1D case", "[particle][1D]") {
     std::stringstream ss;
     // save data to archive
     {
-      auto particle = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
+          std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
       boost::archive::text_oarchive oa(ss);
       oa << *particle;
     }
@@ -175,7 +176,7 @@ TEST_CASE("Particle is checked for 1D case", "[particle][1D]") {
       Eigen::Matrix<double, 1, 1> coordinates;
       coordinates.setZero();
 
-      auto particle =
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
           std::make_shared<mpm::Particle<Dim, Nphases>>(id, coordinates);
       REQUIRE(particle->id() == 1);
 
@@ -362,7 +363,8 @@ TEST_CASE("Particle is checked for 2D case", "[particle][2D]") {
     std::stringstream ss;
     // save data to archive
     {
-      auto particle = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
+          std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
       boost::archive::text_oarchive oa(ss);
       oa << *particle;
     }
@@ -373,7 +375,7 @@ TEST_CASE("Particle is checked for 2D case", "[particle][2D]") {
       Eigen::Vector2d coordinates;
       coordinates.setZero();
 
-      auto particle =
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
           std::make_shared<mpm::Particle<Dim, Nphases>>(id, coordinates);
       REQUIRE(particle->id() == 1);
 
@@ -593,7 +595,7 @@ TEST_CASE("Particle is checked for 3D case", "[particle][3D]") {
 
   //! Test serialize function
   SECTION("Serialisation is checked") {
-    mpm::Index id = 0;
+    mpm::Index id = 12;
     const double Tolerance = 1.E-7;
 
     // Check for negative value of coordinates
@@ -603,23 +605,31 @@ TEST_CASE("Particle is checked for 3D case", "[particle][3D]") {
     std::stringstream ss;
     // save data to archive
     {
-      auto particle = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
-      boost::archive::text_oarchive oa(ss);
-      oa << *particle;
+      std::cout << "save archive\n";
+      boost::archive::text_oarchive oa{ss};
+      oa.register_type<mpm::Particle<Dim, Nphases>>();
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
+          std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
+      oa << particle;
     }
     // load data from archive
     {
+      std::cout << "load archive\n";
       mpm::Index id = 1;
       // Coordinates
       Eigen::Vector3d coordinates;
       coordinates.setZero();
 
-      auto particle =
-          std::make_shared<mpm::Particle<Dim, Nphases>>(id, coordinates);
-      REQUIRE(particle->id() == 1);
-
       // Load from archive
-      boost::archive::text_iarchive(ss) >> *particle;
+      std::cout << ss.str() << "\n";
+      boost::archive::text_iarchive ia{ss};
+
+      //ia.register_type<mpm::Particle<Dim, Nphases>>();
+      std::shared_ptr<mpm::ParticleBase<Dim>> particle =
+          std::make_shared<mpm::Particle<Dim, Nphases>>(ia);
+
+      std::cout << "Particle: " << particle->id() << "\n";
+
       REQUIRE(particle->id() == 0);
       coordinates = particle->coordinates();
       for (unsigned i = 0; i < coordinates.size(); ++i)

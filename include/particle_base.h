@@ -25,6 +25,10 @@ class ParticleBase {
   //! Define a vector of size dimension
   using VectorDim = Eigen::Matrix<double, Tdim, 1>;
 
+  ParticleBase(boost::archive::text_iarchive& archive) {
+    std::cout << "Archive base: " << &archive << "\n";
+  }
+
   //! Constructor with id and coordinates
   ParticleBase(Index id, const VectorDim& coord);
 
@@ -100,15 +104,6 @@ class ParticleBase {
   //! Return acceleration
   virtual Eigen::VectorXd acceleration(unsigned nphase) const = 0;
 
-  //! Serialize
-  friend class boost::serialization::access;
-  template <class Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& id_;
-    ar& coordinates_;
-    std::cout << "Base\n";
-  }
-
  protected:
   //! particleBase id
   Index id_{std::numeric_limits<Index>::max()};
@@ -121,6 +116,21 @@ class ParticleBase {
 
   //! Status
   bool status_{true};
+  
+  //! Serialize
+  friend class boost::serialization::access;
+  template <class Archive>
+  void save(Archive& ar, const unsigned int version) const {
+    ar << id_;
+    ar << coordinates_;
+    std::cout << "Base\n";
+  }
+
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    std::cout << "Base\n";
+  }
 
 };  // ParticleBase class
 }  // namespace mpm

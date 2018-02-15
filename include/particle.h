@@ -27,6 +27,13 @@ class Particle : public ParticleBase<Tdim> {
   //! Define a vector of size dimension
   using VectorDim = Eigen::Matrix<double, Tdim, 1>;
 
+  Particle(boost::archive::text_iarchive& archive)
+      : ParticleBase<Tdim>(archive) {
+    archive >> id_;
+    archive >> coordinates_;
+    std::cout << "Derived\n";
+  }
+
   //! Constructor with id and coordinates
   Particle(Index id, const VectorDim& coord);
 
@@ -88,15 +95,7 @@ class Particle : public ParticleBase<Tdim> {
     return acceleration_.col(nphase);
   }
 
-  friend class boost::serialization::access;
-  template <class Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& id_;
-    ar& coordinates_;
-    std::cout << "Derived\n";
-  }
-
- private:
+private:
   //! particle id
   using ParticleBase<Tdim>::id_;
   //! coordinates
@@ -117,6 +116,15 @@ class Particle : public ParticleBase<Tdim> {
   Eigen::Matrix<double, Tdim, Tnphases> momentum_;
   //! Acceleration
   Eigen::Matrix<double, Tdim, Tnphases> acceleration_;
+  //! Serialize
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    ar& boost::serialization::base_object<mpm::ParticleBase<Tdim>>(*this);
+    ar& id_;
+    ar& coordinates_;
+    std::cout << "Derived\n";
+  }
 
 };  // Particle class
 }  // namespace mpm
