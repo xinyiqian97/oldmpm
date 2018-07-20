@@ -624,17 +624,14 @@ TEST_CASE("Particle is checked for 3D case", "[particle][3D]") {
 
   //! Test serialize function
   SECTION("Serialisation is checked") {
-    mpm::Index id = 12;
+    mpm::Index id = std::numeric_limits<mpm::Index>::max();
     const double Tolerance = 1.E-7;
 
     // Check for negative value of coordinates
     for (unsigned i = 0; i < coords.size(); ++i) coords(i) = i;
 
-    uint64_t *buf = (uint64_t*)malloc(2000);
-    uint64_t *b = buf;
-
     auto particle = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
-    particle->pack(b);
+    auto buf = particle->pack();
 
     for (unsigned i = 0; i < coords.size(); ++i)
       std::cout << "particle 1 coords " << i << " " << particle->coordinates()(i) << std::endl;
