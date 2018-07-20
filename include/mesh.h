@@ -146,6 +146,83 @@ class Mesh {
   //! Return the number of neighbouring meshes
   unsigned nneighbours() const { return neighbour_meshes_.size(); }
 
+  /*
+  std::vector<uint64_t> pack_particles(Container<std::shared_ptr<mpm::ParticleBase<Tdim>>> &particles) {
+    std::list<std::vector<uint64_t>> buf;
+    for (auto &p : particles) {
+      buf.push( p->pack(buf) );
+      remove_particle(p);
+    }
+
+    unsigned size = 0;
+    for (auto &b : buf) {
+      size += b.size();
+    }
+    std::vector<uint64_t> actual_buf(size);
+    auto abuf = actual_buf.data();
+
+    for (auto &b : buf) {
+      memcpy(abuf, b.data(), b.size());
+      abuf += b.size();
+    }
+
+    return actual_buf;
+  }
+  void unpack_particles(std::vector<uint64_t> buf) {
+    std::list<std::vector<uint64_t>> bufs;
+
+    auto b = buf.data();
+    while (b < buf.cend()) {
+      int len = pack_size(b);
+      std::vector<uint64_t> bb(len);
+      memcpy(bb.data(), b, len);
+      bufs.push( bb );
+    }
+
+    for (auto &b : bufs) {
+      auto mytype = typenmap[b[0]];
+      auto p = particle_factory(mytype);
+      p.unpack(b);
+      add_particle(p);
+    }
+
+  }
+
+  std::map<uint64_t, std::string> typemap;
+
+  void sendrecv_particles(std::vector<std::shared_ptr<> &particles) {
+    for (p : particles) {
+      auto b = p->pack();
+      mpi_request req;
+      MPI_Ibsend(b.data(), p.mesh.rank, &req);
+      reqs.push(req);
+    }
+
+    mpi_recv(&npart, 1);
+    for (unsigned i = 0; i < npart; i++) {
+
+      MPI_recv(&sz, )
+
+      MPI_recv(b, sz)
+    }
+
+  }
+
+  void sendrecv_particles(std::vector<std::shared_ptr<> &particles) {
+    buffer_type b2[89];
+    for (n : neighbour_meshes_) {
+      auto b = pack_particles(filter(p for p in particles if p.mesh == n));
+      reqs.push( mpi_isend(b, rank=n.rank) );
+      reqs.push( mpi_irecv(b2, rank=n.rank) );
+    }
+    mpi_wait(reqs.data());
+
+    for (bb : b2) {
+      unpack_particles(bb);
+    }
+  }
+  */
+
  protected:
   //! mesh id
   unsigned id_{std::numeric_limits<unsigned>::max()};
