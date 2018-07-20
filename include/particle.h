@@ -121,6 +121,19 @@ class Particle : public ParticleBase<Tdim> {
     return acceleration_.col(nphase);
   }
 
+  void pack(uint64_t *&buf) {
+    memcpy(buf, &id_, sizeof(id_)); buf+=sizeof(id_);
+    for (unsigned dim = 0; dim < Tdim; ++dim) {
+      memcpy(buf, &coordinates_[dim], sizeof(double)); buf += sizeof(double);
+    }
+  }
+  void unpack(uint64_t *&buf) {
+    memcpy(&id_, buf, sizeof(id_)); buf+=sizeof(id_);
+    for (unsigned dim = 0; dim < Tdim; ++dim) {
+      memcpy(&coordinates_[dim], buf, sizeof(double)); buf += sizeof(double);
+    }
+  }
+
  private:
   //! particle id
   using ParticleBase<Tdim>::id_;

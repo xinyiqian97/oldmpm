@@ -621,4 +621,39 @@ TEST_CASE("Particle is checked for 3D case", "[particle][3D]") {
     status = particle->assign_acceleration(Phase, acceleration);
     REQUIRE(status == false);
   }
+
+  //! Test serialize function
+  SECTION("Serialisation is checked") {
+    mpm::Index id = 12;
+    const double Tolerance = 1.E-7;
+
+    // Check for negative value of coordinates
+    for (unsigned i = 0; i < coords.size(); ++i) coords(i) = i;
+
+    uint64_t *buf = (uint64_t*)malloc(2000);
+    uint64_t *b = buf;
+
+    auto particle = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
+    particle->pack(b);
+
+    for (unsigned i = 0; i < coords.size(); ++i)
+      std::cout << "particle 1 coords " << i << " " << particle->coordinates()(i) << std::endl;
+
+    id = 0;
+    auto particle2 = std::make_shared<mpm::Particle<Dim, Nphases>>(id, coords);
+    std::cout << "particle 2 id " << particle2->id() << std::endl;
+    particle2->unpack(buf);
+
+    std::cout << "particle 1 id " << particle->id() << std::endl;
+    std::cout << "particle 2 id " << particle2->id() << std::endl;
+
+    for (unsigned i = 0; i < coords.size(); ++i)
+      std::cout << "particle 2 coords " << i << " " << particle2->coordinates()(i) << std::endl;
+
+    // Load from archive
+    REQUIRE(particle2->id() == particle->id());
+    auto coordinates = particle2->coordinates();
+    for (unsigned i = 0; i < coordinates.size(); ++i)
+      REQUIRE(coordinates(i) == Approx(coords(i)).epsilon(Tolerance));
+  }
 }
