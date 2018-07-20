@@ -121,21 +121,29 @@ class Particle : public ParticleBase<Tdim> {
     return acceleration_.col(nphase);
   }
 
+  uint64_t type_idx() {
+    return std::hash(myname);
+  }
+
   unsigned pack_size() {
-    return sizeof(id_) + Tdim*sizeof(double);
+    return 1 + 1 + Tdim;
   }
 
   std::vector<uint64_t> pack(/*uint64_t *&buf*/) {
     std::vector<uint64_t> b(pack_size());
     auto buf = b.data();
-    memcpy(buf, &id_, sizeof(id_)); buf+=sizeof(id_);
+    *(buf++) = type_idx();
+    assert( sizeof(id_) <= 8 );
+    memcpy(buf++, &id_, sizeof(id_));
+    assert( sizeof(double) <= 8 );
     for (unsigned dim = 0; dim < Tdim; ++dim) {
-      memcpy(buf, &coordinates_[dim], sizeof(double)); buf += sizeof(double);
+      memcpy(buf++, &coordinates_[dim], sizeof(double));
     }
     return b;
   }
   void unpack(std::vector<uint64_t> &b) {
     auto buf = b.data();
+    assert(*(buf++) == type_idx());
     memcpy(&id_, buf, sizeof(id_)); buf+=sizeof(id_);
     for (unsigned dim = 0; dim < Tdim; ++dim) {
       memcpy(&coordinates_[dim], buf, sizeof(double)); buf += sizeof(double);
