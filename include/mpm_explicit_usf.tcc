@@ -196,12 +196,13 @@ bool mpm::MPMExplicitUSF<Tdim>::solve() {
         std::bind(&mpm::ParticleBase<Tdim>::update_volume_strainrate,
                   std::placeholders::_1, phase, this->dt_));
 
+    /*
     // Locate particles
     auto unlocatable_particles = mesh_->locate_particles_mesh();
 
     if (!unlocatable_particles.empty())
       throw std::runtime_error("Particle outside the mesh domain");
-
+    */
     if (step_ % output_steps_ == 0) {
       // HDF5 outputs
       this->write_hdf5(this->step_, this->nsteps_);

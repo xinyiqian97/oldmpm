@@ -69,14 +69,14 @@ bool mpm::Mesh<Tdim>::remove_node(
 template <unsigned Tdim>
 template <typename Toper>
 void mpm::Mesh<Tdim>::iterate_over_nodes(Toper oper) {
-  tbb::parallel_for_each(nodes_.cbegin(), nodes_.cend(), oper);
+  std::for_each(nodes_.cbegin(), nodes_.cend(), oper);
 }
 
 //! Iterate over nodes
 template <unsigned Tdim>
 template <typename Toper, typename Tpred>
 void mpm::Mesh<Tdim>::iterate_over_nodes_predicate(Toper oper, Tpred pred) {
-  tbb::parallel_for_each(nodes_.cbegin(), nodes_.cend(),
+  std::for_each(nodes_.cbegin(), nodes_.cend(),
                          [=](std::shared_ptr<mpm::NodeBase<Tdim>> node) {
                            if (pred(node)) oper(node);
                          });
@@ -96,7 +96,7 @@ void mpm::Mesh<Tdim>::find_active_nodes() {
 template <unsigned Tdim>
 template <typename Toper>
 void mpm::Mesh<Tdim>::iterate_over_active_nodes(Toper oper) {
-  tbb::parallel_for_each(active_nodes_.cbegin(), active_nodes_.cend(), oper);
+  std::for_each(active_nodes_.cbegin(), active_nodes_.cend(), oper);
 }
 
 #ifdef USE_MPI
@@ -109,7 +109,7 @@ void mpm::Mesh<Tdim>::allreduce_nodal_scalar_property(Tgetfunctor getter,
   mpm::Index nnodes = this->nodes_.size();
   std::vector<double> prop_get(nnodes), prop_set(nnodes);
 
-  tbb::parallel_for_each(
+  std::for_each(
       nodes_.cbegin(), nodes_.cend(),
       [=, &prop_get](std::shared_ptr<mpm::NodeBase<Tdim>> node) {
         prop_get.at(node->id()) = getter(node);
@@ -118,7 +118,7 @@ void mpm::Mesh<Tdim>::allreduce_nodal_scalar_property(Tgetfunctor getter,
   MPI_Allreduce(prop_get.data(), prop_set.data(), nnodes, MPI_DOUBLE, MPI_SUM,
                 MPI_COMM_WORLD);
 
-  tbb::parallel_for_each(
+  std::for_each(
       nodes_.cbegin(), nodes_.cend(),
       [=, &prop_set](std::shared_ptr<mpm::NodeBase<Tdim>> node) {
         setter(node, prop_set.at(node->id()));
@@ -137,7 +137,7 @@ void mpm::Mesh<Tdim>::allreduce_nodal_vector_property(Tgetfunctor getter,
   std::vector<Eigen::Matrix<double, Tdim, 1>> prop_get(nnodes),
       prop_set(nnodes);
 
-  tbb::parallel_for_each(
+  std::for_each(
       nodes_.cbegin(), nodes_.cend(),
       [=, &prop_get](std::shared_ptr<mpm::NodeBase<Tdim>> node) {
         prop_get.at(node->id()) = getter(node);
@@ -146,7 +146,7 @@ void mpm::Mesh<Tdim>::allreduce_nodal_vector_property(Tgetfunctor getter,
   MPI_Allreduce(prop_get.data(), prop_set.data(), nnodes * Tdim, MPI_DOUBLE,
                 MPI_SUM, MPI_COMM_WORLD);
 
-  tbb::parallel_for_each(
+  std::for_each(
       nodes_.cbegin(), nodes_.cend(),
       [=, &prop_set](std::shared_ptr<mpm::NodeBase<Tdim>> node) {
         setter(node, prop_set.at(node->id()));
@@ -226,7 +226,7 @@ bool mpm::Mesh<Tdim>::remove_cell(
 template <unsigned Tdim>
 template <typename Toper>
 void mpm::Mesh<Tdim>::iterate_over_cells(Toper oper) {
-  tbb::parallel_for_each(cells_.cbegin(), cells_.cend(), oper);
+  std::for_each(cells_.cbegin(), cells_.cend(), oper);
 }
 
 //! Create particles from coordinates
@@ -329,7 +329,7 @@ bool mpm::Mesh<Tdim>::locate_particle_cells(
   }
 
   bool status = false;
-  tbb::parallel_for_each(
+  std::for_each(
       cells_.cbegin(), cells_.cend(),
       [=, &status](const std::shared_ptr<mpm::Cell<Tdim>>& cell) {
         // Check if particle is already found, if so don't run for other cells
@@ -348,7 +348,7 @@ bool mpm::Mesh<Tdim>::locate_particle_cells(
 template <unsigned Tdim>
 template <typename Toper>
 void mpm::Mesh<Tdim>::iterate_over_particles(Toper oper) {
-  tbb::parallel_for_each(particles_.cbegin(), particles_.cend(), oper);
+  std::for_each(particles_.cbegin(), particles_.cend(), oper);
 }
 
 //! Iterate over particles

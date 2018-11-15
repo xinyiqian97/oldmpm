@@ -133,7 +133,7 @@ bool mpm::Cell<Tdim>::add_neighbour(
 template <unsigned Tdim>
 bool mpm::Cell<Tdim>::add_particle_id(Index id) {
   bool status = false;
-  std::lock_guard<std::mutex> guard(cell_mutex_);
+  // std::lock_guard<std::mutex> guard(cell_mutex_);
   // Check if it is found in the container
   auto itr = std::find(particles_.begin(), particles_.end(), id);
   if (itr == particles_.end()) {
@@ -146,7 +146,7 @@ bool mpm::Cell<Tdim>::add_particle_id(Index id) {
 //! Remove a particle id
 template <unsigned Tdim>
 void mpm::Cell<Tdim>::remove_particle_id(Index id) {
-  std::lock_guard<std::mutex> guard(cell_mutex_);
+  // std::lock_guard<std::mutex> guard(cell_mutex_);
   particles_.erase(std::remove(particles_.begin(), particles_.end(), id),
                    particles_.end());
 }
