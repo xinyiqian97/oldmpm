@@ -87,6 +87,9 @@ class Particle : public ParticleBase<Tdim> {
   //! Compute shape functions of a particle, based on local coordinates
   bool compute_shapefn() override;
 
+  //! Return porosity
+  double porosity();
+
   //! Assign volume
   //! \param[in] phase Index corresponding to the phase
   //! \param[in] volume Volume of particle for the phase

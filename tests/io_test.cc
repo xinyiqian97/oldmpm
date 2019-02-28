@@ -42,6 +42,7 @@ TEST_CASE("IO is checked for input parsing", "[IO][JSON]") {
           {"dt", 0.001},
           {"nsteps", 1000},
           {"gravity", true},
+          {"porosity", 1},
           {"boundary_friction", 0.5},
           {"damping", {{"damping", true}, {"damping_ratio", 0.02}}},
           {"newmark", {{"newmark", true}, {"gamma", 0.5}, {"beta", 0.25}}}}},
@@ -92,6 +93,8 @@ TEST_CASE("IO is checked for input parsing", "[IO][JSON]") {
     REQUIRE(analysis["nsteps"] == json_file["analysis"]["nsteps"]);
     // Check analysis gravity
     REQUIRE(analysis["gravity"] == json_file["analysis"]["gravity"]);
+    // Check analysis porosity
+    REQUIRE(analysis["porosity"] == json_file["analysis"]["porosity"]);
     // Check analysis soil_particle_spacing
     REQUIRE(analysis["soil_particle_spacing"] ==
             json_file["analysis"]["soil_particle_spacing"]);
